@@ -15,9 +15,9 @@ type Routes []Route
 
 var routes = Routes{
     Route{
-        "incomingHook",
+        "mainRepoIncomingHook",
         "POST",
         "/",
-        incomingHook,
+        mainRepoIncomingHook,
     },
 }
