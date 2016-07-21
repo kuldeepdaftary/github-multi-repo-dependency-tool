@@ -5,11 +5,13 @@ type GithubDataPr struct {
 	Pull_Request struct {
 		Url string `json:"url"`
 		Title string `json:"title"`
+		State string `json:"state"`
         User struct {
             Login string `json:"login"`
         }
         Body string `json:"body"`
         Statuses_Url string `json:"statuses_url"`
+		Merged bool `json:"merged"`
 	}
 }
 type GithubDataPrSet []GithubDataPr

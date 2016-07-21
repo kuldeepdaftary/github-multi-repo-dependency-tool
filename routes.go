@@ -20,4 +20,10 @@ var routes = Routes{
         "/",
         mainRepoIncomingHook,
     },
+    Route{
+        "dependencyRepoIncomingHook",
+        "POST",
+        "/dep",
+        dependencyRepoIncomingHook,
+    },
 }
