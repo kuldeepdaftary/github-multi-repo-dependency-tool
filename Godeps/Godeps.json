@@ -1,12 +1,13 @@
 {
-	"ImportPath": "github.com/tcrands/github-multi-repo-dependency-tool",
+	"ImportPath": "github-multi-repo-dependency-tool",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v74",
-	"Packages": [
-		"github.com/boltdb/bolt",
-		"github.com/gorilla/mux"
-	],
 	"Deps": [
+		{
+			"ImportPath": "github.com/boltdb/bolt",
+			"Comment": "v1.2.1-11-gacc803f",
+			"Rev": "acc803f0ced151102ed51bf824f8709ebd6602bc"
+		},
 		{
 			"ImportPath": "github.com/gorilla/context",
 			"Comment": "v1.1-4-gaed02d1",
@@ -16,11 +17,6 @@
 			"ImportPath": "github.com/gorilla/mux",
 			"Comment": "v1.1-9-gbd09be0",
 			"Rev": "bd09be08ed4377796d312df0a45314e11b8f5dc1"
-		},
-		{
-			"ImportPath": "github.com/boltdb/bolt",
-			"Comment": "v1.2.1-11-gacc803f",
-			"Rev": "acc803f0ced151102ed51bf824f8709ebd6602bc"
 		},
 		{
 			"ImportPath": "golang.org/x/sys/unix",
