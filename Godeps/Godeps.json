@@ -3,7 +3,7 @@
 	"GoVersion": "go1.6",
 	"GodepVersion": "v74",
 	"Packages": [
-		"github.com/boltdb/bolt"
+		"github.com/boltdb/bolt",
 		"github.com/gorilla/mux"
 	],
 	"Deps": [
