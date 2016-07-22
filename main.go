@@ -5,6 +5,7 @@ import (
     "net/http"
     "time"
     "fmt"
+    "os"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
     router := NewRouter()
 
     server := &http.Server{
-    	Addr: ":5000",
+    	Addr: determineListenAddress(),
     	Handler: router,
     	ReadTimeout: 10 * time.Second,
     	WriteTimeout: 10 * time.Second,
@@ -23,4 +24,12 @@ func main() {
     setupDatabase()
 
     log.Fatal(server.ListenAndServe())
+}
+
+func determineListenAddress() string {
+  port := os.Getenv("PORT")
+  if port == "" {
+    return ":8080"
+  }
+  return ":" + port
 }
