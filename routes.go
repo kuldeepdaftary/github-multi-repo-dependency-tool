@@ -15,6 +15,12 @@ type Routes []Route
 
 var routes = Routes{
     Route{
+        "dependencyRepoIncomingHook",
+        "GET",
+        "/",
+        serverTest,
+    },
+    Route{
         "mainRepoIncomingHook",
         "POST",
         "/",
