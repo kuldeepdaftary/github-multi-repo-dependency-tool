@@ -1,1 +1,1 @@
-web: ./github-multi-repo-dependency-tool
+web: github-multi-repo-dependency-tool
