@@ -4,6 +4,7 @@ import (
     "log"
     "fmt"
     "github.com/boltdb/bolt"
+    "net/http"
 )
 
 func setupDatabase() {
@@ -42,4 +43,23 @@ func updateDatabase(prUrl string, pullUrl string)  {
         fmt.Printf("Value Stored: %s\n", append(depPullUrl, (" With Key: " + prUrl)...))
     return nil
     })
+}
+
+func flushDatabase(w http.ResponseWriter, r *http.Request) {
+    db, err := bolt.Open("dependencyMap.db", 0600, nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer db.Close()
+
+    db.Update(func(tx *bolt.Tx) error {
+        tx.DeleteBucket([]byte("dependencyMapBucket"))
+        return err
+    })
+
+    db.View(func(tx *bolt.Tx) error {
+    b := tx.Bucket([]byte("dependencyMapBucket"))
+    fmt.Printf("BUCKET: %s\n", b)
+    return nil
+})
 }

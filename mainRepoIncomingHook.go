@@ -75,6 +75,7 @@ func changePrStatus(pullUrl string, status string, prRepoName string) {
     message := prepareMessage(prRepoName, status)
 
     var jsonStr = []byte(`{"state": "` + status + `", "target_url": "` + pullUrl + `", "description": "` + message + `", "context": "Dependency Manager"}`)
+
     req, err := http.NewRequest("POST", Statuses_Url, bytes.NewBuffer(jsonStr))
     if err != nil {
 		panic(err)

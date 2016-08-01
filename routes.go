@@ -32,4 +32,10 @@ var routes = Routes{
         "/dep",
         dependencyRepoIncomingHook,
     },
+    Route{
+        "flushDatabase",
+        "GET",
+        "/flush",
+        flushDatabase,
+    },
 }
