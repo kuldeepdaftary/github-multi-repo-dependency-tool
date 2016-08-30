@@ -7,13 +7,11 @@ import (
     "net/http"
 )
 
-func setupDatabase() {
+func setupDatabase() (*bolt.DB, error){
     db, err := bolt.Open("dependencyMap.db", 0600, nil)
     if err != nil {
         log.Fatal(err)
     }
-
-    defer db.Close()
 
     db.Update(func(tx *bolt.Tx) error {
         _, err := tx.CreateBucketIfNotExists([]byte("dependencyMapBucket"))
@@ -22,44 +20,60 @@ func setupDatabase() {
         }
         return nil
     })
+
+    return db, err
 }
 
-func updateDatabase(prUrl string, pullUrl string)  {
-    db, err := bolt.Open("dependencyMap.db", 0600, nil)
-    if err != nil {
-        log.Fatal(err)
-    }
+func updateDatabase(prUrl string, depUrl string)  {
+    db, _ := setupDatabase()
     defer db.Close()
 
     db.Update(func(tx *bolt.Tx) error {
         b := tx.Bucket([]byte("dependencyMapBucket"))
-        err := b.Put([]byte(prUrl), []byte(pullUrl))
+        err := b.Put([]byte(depUrl), []byte(prUrl))
         return err
     })
 
     db.View(func(tx *bolt.Tx) error {
         b := tx.Bucket([]byte("dependencyMapBucket"))
-        depPullUrl := b.Get([]byte(prUrl))
-        fmt.Printf("Value Stored: %s\n", append(depPullUrl, (" With Key: " + prUrl)...))
-    return nil
+        prUrl := b.Get([]byte(depUrl))
+        fmt.Printf("Value Stored: %s\n", append(prUrl, (" With Key: " + depUrl)...))
+        return nil
     })
 }
 
-func flushDatabase(w http.ResponseWriter, r *http.Request) {
-    db, err := bolt.Open("dependencyMap.db", 0600, nil)
-    if err != nil {
-        log.Fatal(err)
-    }
+func checkDatabase(depUrl string) (bool, string) {
+    db, _ := setupDatabase()
     defer db.Close()
 
+    var prUrl = ""
+
+    db.View(func(tx *bolt.Tx) error {
+        b := tx.Bucket([]byte("dependencyMapBucket"))
+        val := b.Get([]byte(depUrl))
+        prUrl = string(val[:])
+        return nil
+    })
+
+    if prUrl != "" {
+        return true, prUrl
+    } else {
+        return false, prUrl
+    }
+}
+
+func flushDatabase(w http.ResponseWriter, r *http.Request) {
+    db, err := setupDatabase()
+    defer db.Close()
+    
     db.Update(func(tx *bolt.Tx) error {
         tx.DeleteBucket([]byte("dependencyMapBucket"))
         return err
     })
 
     db.View(func(tx *bolt.Tx) error {
-    b := tx.Bucket([]byte("dependencyMapBucket"))
-    fmt.Printf("BUCKET: %s\n", b)
-    return nil
-})
+        b := tx.Bucket([]byte("dependencyMapBucket"))
+        fmt.Printf("BUCKET: %s\n", b)
+        return nil
+    })
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-    "fmt"
+    // "fmt"
     "net/http"
     "encoding/json"
 )
@@ -15,7 +15,12 @@ func dependencyRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-    fmt.Println(githubDataPr.Pull_Request.State)
-    fmt.Println(githubDataPr.Pull_Request.Merged)
-
+    if githubDataPr.Pull_Request.Merged == true {
+        exists, url := checkDatabase(githubDataPr.Pull_Request.Url)
+        if exists == true {
+            changePrStatus(url, "success", "atlas-roku")
+        }
+    } else {
+        // DO NOTHING FOR NOW
+    }
 }
