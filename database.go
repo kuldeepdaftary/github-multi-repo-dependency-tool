@@ -62,10 +62,21 @@ func checkDatabase(depUrl string) (bool, string) {
     }
 }
 
+func removeKey(depUrl string) {
+    db, _ := setupDatabase()
+    defer db.Close()
+
+    db.Update(func(tx *bolt.Tx) error {
+        b := tx.Bucket([]byte("dependencyMapBucket"))
+        err := b.Delete([]byte(depUrl))
+        return err
+    })
+}
+
 func flushDatabase(w http.ResponseWriter, r *http.Request) {
     db, err := setupDatabase()
     defer db.Close()
-    
+
     db.Update(func(tx *bolt.Tx) error {
         tx.DeleteBucket([]byte("dependencyMapBucket"))
         return err
