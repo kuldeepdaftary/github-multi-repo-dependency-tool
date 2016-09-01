@@ -24,7 +24,7 @@ func setupDatabase() (*bolt.DB, error){
     return db, err
 }
 
-func updateDatabase(prUrl string, depUrl string)  {
+func updateDatabase(prUrl string, depUrl string) {
     db, _ := setupDatabase()
     defer db.Close()
 
@@ -74,12 +74,12 @@ func removeKey(depUrl string) {
 }
 
 func flushDatabase(w http.ResponseWriter, r *http.Request) {
-    db, err := setupDatabase()
+    db, _ := setupDatabase()
     defer db.Close()
 
     db.Update(func(tx *bolt.Tx) error {
         tx.DeleteBucket([]byte("dependencyMapBucket"))
-        return err
+        return nil
     })
 
     db.View(func(tx *bolt.Tx) error {
