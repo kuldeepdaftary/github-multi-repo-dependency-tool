@@ -11,6 +11,8 @@ func setupDatabase() (*bolt.DB, error){
     db, err := bolt.Open("dependencyMap.db", 0600, nil)
     if err != nil {
         log.Fatal(err)
+    } else {
+        fmt.Printf("Database Setup success")
     }
 
     db.Update(func(tx *bolt.Tx) error {

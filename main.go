@@ -21,8 +21,6 @@ func main() {
     	MaxHeaderBytes: 1 << 20,
     }
 
-    setupDatabase()
-
     log.Fatal(server.ListenAndServe())
 }
 
