@@ -6,6 +6,7 @@ import (
     "encoding/json"
     "strings"
     "bytes"
+    "sync"
 )
 
 func checkDependencyPr(depUrl string, prUrl string) {
@@ -31,38 +32,47 @@ func checkDependencyPr(depUrl string, prUrl string) {
         prRepoName := githubDataDependency.Head.Repo.Name
 
         if state == "closed" {
-            status := "success"
-            changePrStatus(depUrl, status, prRepoName)
+            // status := "success"
+            // changePrStatus(depUrl, status, prRepoName)
         } else {
             status := "failure"
             newUrl := strings.Replace(depUrl, "api.github.com/repos", "github.com", 1)
             newDepUrl := strings.Replace(newUrl, "pulls", "pull", 1)
-            updateDatabase(prUrl, newDepUrl)
-            changePrStatus(newDepUrl, status, prRepoName)
+            var wg sync.WaitGroup
+
+            updateDatabase(prUrl, newDepUrl, &wg)
+            changePrStatus(newDepUrl, status, prRepoName, &wg)
+
+	        wg.Wait()
         }
     }
 }
 
-func changePrStatus(depUrl string, status string, prRepoName string) {
-    client := &http.Client{}
+func changePrStatus(depUrl string, status string, prRepoName string, wg *sync.WaitGroup) {
+    wg.Add(1)
 
-    message := prepareMessage(prRepoName, status)
+    go func() {
+		defer wg.Done()
+        client := &http.Client{}
 
-    var jsonStr = []byte(`{"state": "` + status + `", "target_url": "` + depUrl + `", "description": "` + message + `", "context": "Dependency Manager"}`)
-    fmt.Println(bytes.NewBuffer(jsonStr))
-    req, err := http.NewRequest("POST", Statuses_Url, bytes.NewBuffer(jsonStr))
-    if err != nil {
-		panic(err)
-	}
-    req.Header.Add("Authorization", `Basic dGNyYW5kczpiYWlsZXkxMjM=`)
-    resp, err := client.Do(req)
-    defer resp.Body.Close()
+        message := prepareMessage(prRepoName, status)
 
-    if resp.StatusCode == 201 {
-        fmt.Println("Pull Request Status Updated")
-    } else {
-        fmt.Println(resp.StatusCode)
-    }
+        var jsonStr = []byte(`{"state": "` + status + `", "target_url": "` + depUrl + `", "description": "` + message + `", "context": "Dependency Manager"}`)
+        fmt.Println(bytes.NewBuffer(jsonStr))
+        req, err := http.NewRequest("POST", Statuses_Url, bytes.NewBuffer(jsonStr))
+        if err != nil {
+    		panic(err)
+    	}
+        req.Header.Add("Authorization", `Basic dGNyYW5kczpiYWlsZXkxMjM=`)
+        resp, err := client.Do(req)
+        defer resp.Body.Close()
+
+        if resp.StatusCode == 201 {
+            fmt.Println("Pull Request Status Updated")
+        } else {
+            fmt.Println(resp.StatusCode)
+        }
+	}()
 }
 
 func prepareMessage(prRepoName string, status string) string {

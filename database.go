@@ -5,6 +5,7 @@ import (
     "fmt"
     "github.com/boltdb/bolt"
     "net/http"
+    "sync"
 )
 
 func setupDatabase() (*bolt.DB, error){
@@ -24,22 +25,27 @@ func setupDatabase() (*bolt.DB, error){
     return db, err
 }
 
-func updateDatabase(prUrl string, depUrl string) {
-    db, _ := setupDatabase()
-    defer db.Close()
+func updateDatabase(prUrl string, depUrl string, wg *sync.WaitGroup) {
+    wg.Add(1)
 
-    db.Update(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte("dependencyMapBucket"))
-        err := b.Put([]byte(depUrl), []byte(prUrl))
-        return err
-    })
+    go func() {
+		defer wg.Done()
+        db, _ := setupDatabase()
+        defer db.Close()
 
-    db.View(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte("dependencyMapBucket"))
-        prUrl := b.Get([]byte(depUrl))
-        fmt.Printf("Value Stored: %s\n", append(prUrl, (" With Key: " + depUrl)...))
-        return nil
-    })
+        db.Update(func(tx *bolt.Tx) error {
+            b := tx.Bucket([]byte("dependencyMapBucket"))
+            err := b.Put([]byte(depUrl), []byte(prUrl))
+            return err
+        })
+
+        db.View(func(tx *bolt.Tx) error {
+            b := tx.Bucket([]byte("dependencyMapBucket"))
+            prUrl := b.Get([]byte(depUrl))
+            fmt.Printf("Value Stored: %s\n", append(prUrl, (" With Key: " + depUrl)...))
+            return nil
+        })
+	}()
 }
 
 func checkDatabase(depUrl string) (bool, string) {
@@ -62,15 +68,20 @@ func checkDatabase(depUrl string) (bool, string) {
     }
 }
 
-func removeKey(depUrl string) {
-    db, _ := setupDatabase()
-    defer db.Close()
+func removeKey(depUrl string, wg *sync.WaitGroup) {
+    wg.Add(1)
 
-    db.Update(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte("dependencyMapBucket"))
-        err := b.Delete([]byte(depUrl))
-        return err
-    })
+    go func() {
+		defer wg.Done()
+        db, _ := setupDatabase()
+        defer db.Close()
+
+        db.Update(func(tx *bolt.Tx) error {
+            b := tx.Bucket([]byte("dependencyMapBucket"))
+            err := b.Delete([]byte(depUrl))
+            return err
+        })
+	}()
 }
 
 func flushDatabase(w http.ResponseWriter, r *http.Request) {

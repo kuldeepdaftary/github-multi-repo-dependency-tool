@@ -4,6 +4,7 @@ import (
     "fmt"
     "net/http"
     "encoding/json"
+    "sync"
 )
 
 func dependencyRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
@@ -19,8 +20,12 @@ func dependencyRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
     if githubDataPr.Pull_Request.Merged == true {
         exists, url := checkDatabase(githubDataPr.Pull_Request.Url)
         if exists == true {
-            changePrStatus(url, "success", "atlas-roku")
-            removeKey(githubDataPr.Pull_Request.Url)
+            var wg sync.WaitGroup
+
+            changePrStatus(url, "success", "atlas-roku", &wg)
+            removeKey(githubDataPr.Pull_Request.Url, &wg)
+
+	        wg.Wait()
         }
     } else {
         // DO NOTHING FOR NOW
