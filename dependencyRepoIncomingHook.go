@@ -1,12 +1,13 @@
 package main
 
 import (
-    // "fmt"
+    "fmt"
     "net/http"
     "encoding/json"
 )
 
 func dependencyRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("DEP")
     decoder := json.NewDecoder(r.Body)
 	githubDataPr := &GithubDataPr{}
 	err := decoder.Decode(&githubDataPr)
