@@ -74,17 +74,18 @@ func removeKey(depUrl string) {
 }
 
 func flushDatabase(w http.ResponseWriter, r *http.Request) {
-    db, _ := setupDatabase()
-    defer db.Close()
-
-    db.Update(func(tx *bolt.Tx) error {
-        tx.DeleteBucket([]byte("dependencyMapBucket"))
-        return nil
-    })
-
-    db.View(func(tx *bolt.Tx) error {
-        b := tx.Bucket([]byte("dependencyMapBucket"))
-        fmt.Printf("BUCKET: %s\n", b)
-        return nil
-    })
+    fmt.Println("FLUSHING")
+    // db, _ := setupDatabase()
+    // defer db.Close()
+    //
+    // db.Update(func(tx *bolt.Tx) error {
+    //     tx.DeleteBucket([]byte("dependencyMapBucket"))
+    //     return nil
+    // })
+    //
+    // db.View(func(tx *bolt.Tx) error {
+    //     b := tx.Bucket([]byte("dependencyMapBucket"))
+    //     fmt.Printf("BUCKET: %s\n", b)
+    //     return nil
+    // })
 }
