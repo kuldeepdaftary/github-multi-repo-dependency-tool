@@ -37,8 +37,8 @@ func checkDependencyPr(depUrl string, prUrl string) {
             status := "failure"
             newUrl := strings.Replace(depUrl, "api.github.com/repos", "github.com", 1)
             newDepUrl := strings.Replace(newUrl, "pulls", "pull", 1)
-            go updateDatabase(prUrl, newDepUrl)
-            go changePrStatus(newDepUrl, status, prRepoName)
+            updateDatabase(prUrl, newDepUrl)
+            changePrStatus(newDepUrl, status, prRepoName)
         }
     }
 }
