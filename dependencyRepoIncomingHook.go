@@ -16,7 +16,8 @@ func dependencyRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 	}
 
     if githubDataPr.Pull_Request.Merged == true {
-        exists, url := checkDatabase(githubDataPr.Pull_Request.Url)
+	depUrl := strings.Replace(githubDataPr.Pull_Request.Url, "github.com", "api.github.com/repos", 1)
+        exists, url := checkDatabase(depUrl)
         if exists == true {
             go changePrStatus(url, "success", "atlas-roku")
             go removeKey(githubDataPr.Pull_Request.Url)
