@@ -51,13 +51,13 @@ func checkDatabase(depUrl string) (bool, string) {
 
     var prUrl = ""
     
-    fmt.Printlin(depUrl)
+    fmt.Println(depUrl)
 
     db.View(func(tx *bolt.Tx) error {
         b := tx.Bucket([]byte("dependencyMapBucket"))
         val := b.Get([]byte(depUrl))
         prUrl = string(val[:])
-        fmt.Printlin(depUrl)
+        fmt.Println(depUrl)
         return nil
     })
     
