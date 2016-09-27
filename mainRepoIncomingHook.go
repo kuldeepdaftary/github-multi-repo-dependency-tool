@@ -18,13 +18,16 @@ func mainRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	if strings.Contains(githubDataPr.Pull_Request.Body, "REQUIRED") {
-        Statuses_Url = githubDataPr.Pull_Request.Statuses_Url
-        githubDataPr.processRequiredBody()
+    if githubDataPr.Action == "opened" {
+    	if strings.Contains(githubDataPr.Pull_Request.Body, "REQUIRED") {
+            Statuses_Url = githubDataPr.Pull_Request.Statuses_Url
+            depUrl, prUrl := githubDataPr.processRequiredBody()
+            checkDependencyPr(depUrl, prUrl)
+        }
     }
 }
 
-func (githubDataPr GithubDataPr) processRequiredBody() {
+func (githubDataPr GithubDataPr) processRequiredBody() (string, string) {
     s := strings.Trim(strings.Split(githubDataPr.Pull_Request.Body, "REQUIRED:")[1], " ")
 
     newUrl := strings.Replace(s, "github.com", "api.github.com/repos", 1)
@@ -33,5 +36,5 @@ func (githubDataPr GithubDataPr) processRequiredBody() {
     prUrlTmp := strings.Replace(githubDataPr.Pull_Request.Url, "api.github.com/repos", "github.com", 1)
     prUrl := strings.Replace(prUrlTmp, "pulls", "pull", 1)
 
-    checkDependencyPr(depUrl, prUrl)
+    return depUrl, prUrl
 }

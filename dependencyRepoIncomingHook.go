@@ -15,22 +15,24 @@ func dependencyRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	
-	fmt.Println(githubDataPr)
 
-    if githubDataPr.Pull_Request.Merged == true {
-	fmt.Println("MERGED IS TRUE")
-	depUrlTmp := strings.Replace(githubDataPr.Pull_Request.Url, "api.github.com/repos", "github.com", 1)
-	depUrl := strings.Replace(depUrlTmp, "pulls", "pull", 1)
-	fmt.Println(depUrl) 
-        exists, url := checkDatabase(depUrl)
-        if exists == true {
-	    fmt.Println("EXISTS IS TRUE")
-	    fmt.Println(url)
-            go changePrStatus(url, "success", "tv")
-            go removeKey(githubDataPr.Pull_Request.Url)
+	if githubDataPr.Action == "closed" {
+        if githubDataPr.Pull_Request.Merged == true {
+
+    	depUrlTmp := strings.Replace(githubDataPr.Pull_Request.Url, "api.github.com/repos", "github.com", 1)
+    	depUrl := strings.Replace(depUrlTmp, "pulls", "pull", 1)
+
+            exists, url := checkDatabase(depUrl)
+            if exists == true {
+                urlTmp := strings.Replace(url, "https://github.com/", "", 1)
+                fmt.Println(urlTmp)
+                repoName := strings.Split(urlTmp, "/")[1]
+                fmt.Println(repoName)
+                go changePrStatus(url, "success", repoName)
+                go removeKey(githubDataPr.Pull_Request.Url)
+            }
+        } else {
+            // DO NOTHING FOR NOW
         }
-    } else {
-        // DO NOTHING FOR NOW
     }
 }
