@@ -56,6 +56,9 @@ func checkDatabase(depUrl string) (bool, string) {
         prUrl = string(val[:])
         return nil
     })
+    
+    fmt.Printf("PRURL --------------",prUrl)
+    fmt.Printf("PRURL --------------",depUrl)
 
     if prUrl != "" {
         return true, prUrl
