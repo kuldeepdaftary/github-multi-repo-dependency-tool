@@ -31,7 +31,7 @@ func (githubDataPr GithubDataPr) processRequiredBody() {
     depUrl := strings.Replace(newUrl, "pull", "pulls", 1)
 
     prUrlTmp := strings.Replace(githubDataPr.Pull_Request.Url, "api.github.com/repos", "github.com", 1)
-    prUrl := strings.Replace(prUrlTmp, "pull", "pulls", 1)
+    prUrl := strings.Replace(prUrlTmp, "pulls", "pull", 1)
 
     checkDependencyPr(depUrl, prUrl)
 }
