@@ -16,15 +16,15 @@ func dependencyRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	
-	fmt.PrintLn(githubDataPr)
+	fmt.Println(githubDataPr)
 
     if githubDataPr.Pull_Request.Merged == true {
-	fmt.PrintLn("MERGED IS TRUE")
+	fmt.Println("MERGED IS TRUE")
 	depUrl := strings.Replace(githubDataPr.Pull_Request.Url, "api.github.com/repos", "github.com", 1)
         exists, url := checkDatabase(depUrl)
         if exists == true {
-	    fmt.PrintLn("EXISTS IS TRUE")
-	    fmt.PrintLn(url)
+	    fmt.Println("EXISTS IS TRUE")
+	    fmt.Println(url)
             go changePrStatus(url, "success", "tv")
             go removeKey(githubDataPr.Pull_Request.Url)
         }
