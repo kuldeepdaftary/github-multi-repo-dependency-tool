@@ -11,6 +11,7 @@ func setupDatabase() (*bolt.DB, error){
     db, err := bolt.Open("dependencyMap.db", 0600, nil)
     if err != nil {
         log.Fatal(err)
+        fmt.Printf("Database Setup failure")
     } else {
         fmt.Printf("Database Setup success")
     }
@@ -49,11 +50,14 @@ func checkDatabase(depUrl string) (bool, string) {
     defer db.Close()
 
     var prUrl = ""
+    
+    fmt.Printlin(depUrl)
 
     db.View(func(tx *bolt.Tx) error {
         b := tx.Bucket([]byte("dependencyMapBucket"))
         val := b.Get([]byte(depUrl))
         prUrl = string(val[:])
+        fmt.Printlin(depUrl)
         return nil
     })
     
