@@ -25,9 +25,7 @@ func dependencyRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
             exists, url := checkDatabase(depUrl)
             if exists == true {
                 urlTmp := strings.Replace(url, "https://github.com/", "", 1)
-                fmt.Println(urlTmp)
                 repoName := strings.Split(urlTmp, "/")[1]
-                fmt.Println(repoName)
                 go changePrStatus(url, "success", repoName)
                 go removeKey(githubDataPr.Pull_Request.Url)
             }

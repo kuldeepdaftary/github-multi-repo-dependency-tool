@@ -18,7 +18,7 @@ func mainRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-    if githubDataPr.Action == "opened" {
+    if githubDataPr.Action == "opened" || githubDataPr.Action == "reopened"{
     	if strings.Contains(githubDataPr.Pull_Request.Body, "REQUIRED") {
             Statuses_Url = githubDataPr.Pull_Request.Statuses_Url
             depUrl, prUrl := githubDataPr.processRequiredBody()
