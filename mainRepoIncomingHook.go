@@ -19,8 +19,8 @@ func mainRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 	}
 
     if githubDataPr.Action == "opened" || githubDataPr.Action == "reopened" || githubDataPr.Action == "synchronize" {
+	Statuses_Url = githubDataPr.Pull_Request.Statuses_Url
     	if strings.Contains(githubDataPr.Pull_Request.Body, "REQUIRED") {
-            Statuses_Url = githubDataPr.Pull_Request.Statuses_Url
             depUrl, prUrl := githubDataPr.processRequiredBody()
             checkDependencyPr(depUrl, prUrl)
         } else {
