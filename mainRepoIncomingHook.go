@@ -23,6 +23,8 @@ func mainRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
             Statuses_Url = githubDataPr.Pull_Request.Statuses_Url
             depUrl, prUrl := githubDataPr.processRequiredBody()
             checkDependencyPr(depUrl, prUrl)
+        } else {
+            changePrStatus("", "success", "")
         }
     }
 }
