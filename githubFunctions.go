@@ -50,6 +50,7 @@ func changePrStatus(depUrl string, status string, prRepoName string) {
 
     var jsonStr = []byte(`{"state": "` + status + `", "target_url": "` + depUrl + `", "description": "` + message + `", "context": "Dependency Manager"}`)
     fmt.Println(bytes.NewBuffer(jsonStr))
+    fmt.Println(Statuses_Url)
     req, err := http.NewRequest("POST", Statuses_Url, bytes.NewBuffer(jsonStr))
     if err != nil {
 		panic(err)
