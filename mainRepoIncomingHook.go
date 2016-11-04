@@ -1,16 +1,14 @@
 package main
 
 import (
-    "net/http"
-    "encoding/json"
-    "strings"
+	"encoding/json"
+	"net/http"
+	"strings"
 )
-
-var Statuses_Url string
 
 func mainRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 
-    decoder := json.NewDecoder(r.Body)
+	decoder := json.NewDecoder(r.Body)
 	githubDataPr := &GithubDataPr{}
 	err := decoder.Decode(&githubDataPr)
 
@@ -18,19 +16,27 @@ func mainRepoIncomingHook(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	if strings.Contains(githubDataPr.Pull_Request.Body, "REQUIRED") {
-        Statuses_Url = githubDataPr.Pull_Request.Statuses_Url
-        githubDataPr.processRequiredBody()
-    }
+	statusUrl := ""
+
+	if githubDataPr.Action == "opened" || githubDataPr.Action == "reopened" {
+		if strings.Contains(githubDataPr.Pull_Request.Body, "REQUIRED") {
+			statusUrl = githubDataPr.Pull_Request.Statuses_Url
+			depUrl, prUrl := githubDataPr.processRequiredBody()
+			checkDependencyPr(depUrl, prUrl, statusUrl)
+		} else {
+			changePrStatus("", "success", "", statusUrl)
+		}
+	}
 }
 
-func (githubDataPr GithubDataPr) processRequiredBody() {
-    s := strings.Trim(strings.Split(githubDataPr.Pull_Request.Body, "REQUIRED:")[1], " ")
+func (githubDataPr GithubDataPr) processRequiredBody() (string, string) {
+	s := strings.Trim(strings.Split(githubDataPr.Pull_Request.Body, "REQUIRED:")[1], " ")
 
-    newUrl := strings.Replace(s, "github.com", "api.github.com/repos", 1)
-    depUrl := strings.Replace(newUrl, "pull", "pulls", 1)
+	newUrl := strings.Replace(s, "github.com", "api.github.com/repos", 1)
+	depUrl := strings.Replace(newUrl, "pull", "pulls", 1)
 
-    prUrl := githubDataPr.Pull_Request.Url
+	prUrlTmp := strings.Replace(githubDataPr.Pull_Request.Url, "api.github.com/repos", "github.com", 1)
+	prUrl := strings.Replace(prUrlTmp, "pulls", "pull", 1)
 
-    checkDependencyPr(depUrl, prUrl)
+	return depUrl, prUrl
 }
